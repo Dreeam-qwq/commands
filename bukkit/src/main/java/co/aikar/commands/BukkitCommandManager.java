@@ -337,7 +337,25 @@ public class BukkitCommandManager extends CommandManager<
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (NoSuchMethodError e) {
+            Object nmsPlayer = player.getPlayer();
+            if (nmsPlayer != null) {
+                Object localeString = player.getLocale();
+                if (localeString instanceof String) {
+                    UUID playerUniqueId = player.getUniqueId();
+                    if (!localeString.equals(issuersLocaleString.get(playerUniqueId))) {
+                        String[] split = ACFPatterns.UNDERSCORE.split((String) localeString);
+                        Locale locale = split.length > 1 ? new Locale(split[0], split[1]) : new Locale(split[0]);
+                        Locale prev = issuersLocale.put(playerUniqueId, locale);
+                        issuersLocaleString.put(playerUniqueId, (String) localeString);
+                        if (!Objects.equals(locale, prev)) {
+                            this.notifyLocaleChange(getCommandIssuer(player), prev, locale);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
             cantReadLocale = true;
             this.scheduler.cancelLocaleTask();
             this.log(LogLevel.INFO, "Can't read players locale, you will be unable to automatically detect players language. Only Bukkit 1.7+ is supported for this.", e);
