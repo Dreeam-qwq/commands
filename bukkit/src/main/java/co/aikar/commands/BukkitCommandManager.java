@@ -337,7 +337,7 @@ public class BukkitCommandManager extends CommandManager<
                     }
                 }
             }
-        } catch (NoSuchMethodError e) {
+        } catch (NoSuchFieldException e) {
             Object nmsPlayer = player.getPlayer();
             if (nmsPlayer != null) {
                 Object localeString = player.getLocale();
